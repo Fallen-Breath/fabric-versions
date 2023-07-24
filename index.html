@@ -9,17 +9,12 @@
 
 <body>
     <h1>Fabric Latest Versions</h1>
-
-    <img alt="Discord" src="https://img.shields.io/discord/507304429255393322.svg?label=discord"> <img
-        alt="GitHub stars" src="https://img.shields.io/github/stars/FabricMC/yarn.svg?label=Yarn&style=social"> <img
-        alt="GitHub stars" src="https://img.shields.io/github/stars/FabricMC/fabric.svg?label=Fabric&style=social">
-
     <p>Minecraft Version:
         <select name="versions" id="versions" onchange="updateSelection()">
         </select>
     </p>
     <p>Note fabric-api version may not be the correct version for the given minecraft version. See the <a
-            href="https://minecraft.curseforge.com/projects/fabric/files">curseforge</a> page.</p>
+            href="https://legacy.curseforge.com/minecraft/mc-mods/fabric-api/files">curseforge</a> page.</p>
 
     <h3>build.gradle</h3>
 
@@ -53,19 +48,12 @@ fabric_version={fabric_version}</code></pre>
     
     <h1>Mappings Migration</h1>
     <p>Mappings can be auto updated by using the following command. See the <a href="https://fabricmc.net/wiki/tutorial:migratemappings">wiki page</a> for more help.</p>
-    <div name="code">
-        <pre><code class="bash">gradlew migrateMappings --mappings "{yarn_version}"</code></pre>
-    </div>
 
-    <hr>
+    <p>See <a href="https://fabricmc.net/develop/">fabricmc.net</a> for more details</p>
+
     <h1>Loom Version</h1>
 
-    <h3>The recommended loom version is <strong>0.5-SNAPSHOT</strong></h3>
-    <p>When upgrading to loom 0.2.6 make sure to take a look at the upgrade guide <a href="https://gist.github.com/modmuss50/5e9415c7b6ea0fc96e56002a2b5f4fc7">here</a></p>
-
-    <br>
-
-    <p>Want to help improve this page? Fork it on <a href="https://github.com/modmuss50/fabric-versions">github</a></p>
+    The recommended loom version, see <a href="https://fabricmc.net/develop/">fabricmc.net</a>
 
 </body>
 
@@ -157,11 +145,8 @@ fabric_version={fabric_version}</code></pre>
             }
         });
 
-        var versionUrl = "https://maven.fabricmc.net/net/fabricmc/fabric/maven-metadata.xml";
         var mavenStr = "net.fabricmc:fabric:";
-
         var newApi = true;
-
         for(i in mcVersions){
             var vi = mcVersions[i].version;
             if(vi === "1.14"){
@@ -174,58 +159,37 @@ fabric_version={fabric_version}</code></pre>
         }
 
         if (newApi) {
-            versionUrl = "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/maven-metadata.xml";
             mavenStr = "net.fabricmc.fabric-api:fabric-api:";
         }
 
-        var branch = "1.15"
-        //TODO make this better
-        if(version === "1.14.4"){
-            branch = "1.14"
-        }
-        if (version.startsWith("20w")) {
-            branch = "1.16"
-        }
-
-        findVersion(versionUrl, branch,
-            function (version) {
-                var codeBlocks = document.getElementsByName("code");
-                for (i in codeBlocks) {
-                    var block = codeBlocks[i];
-                    block.innerHTML = block.innerHTML.replaceAll("{fabric_version}", version);
-                    block.innerHTML = block.innerHTML.replaceAll("{fabric_maven}", mavenStr);
-                }
-            })
-
-
+        findVersion(version, function (fabricApiVersion) {
+            console.log('fabricApiVersion', fabricApiVersion)
+            var codeBlocks = document.getElementsByName("code");
+            for (i in codeBlocks) {
+                var block = codeBlocks[i];
+                block.innerHTML = block.innerHTML.replaceAll("{fabric_version}", fabricApiVersion);
+                block.innerHTML = block.innerHTML.replaceAll("{fabric_maven}", mavenStr);
+            }
+        })
     }
 
-    function findVersion(url, branch, onLoad) {
+    function findVersion(mcVersion, onLoad) {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                var parser = new DOMParser();
-                var xmlDoc = parser.parseFromString(xhttp.responseText, "text/xml");
-                
-                var versions = xmlDoc.getElementsByTagName("version");
-                var latestVersion = xmlDoc.getElementsByTagName("release")[0].childNodes[0].nodeValue;
-
-                Object.keys(versions).forEach(function(value, number) {
-                    var version = versions[number].childNodes[0].nodeValue;
-                    if(version.endsWith(branch)){
-                        latestVersion = versions[number].childNodes[0].nodeValue;
-                    }
-
-                    console.log(versions[number].childNodes[0].nodeValue)
-                });
-                onLoad(latestVersion)
+            if (this.readyState === 4 && this.status === 200) {
+                let data = JSON.parse(xhttp.responseText)
+                console.log('modrinth response:', data)
+                data.sort((a, b) => Date.parse(a['date_published']) - Date.parse(b['date_published']))
+                onLoad(data[data.length - 1]['version_number'])
             }
         };
 
-        //Get around caching issues
-        var milliseconds = (new Date).getTime();
-        url += "?t=" + milliseconds
-
+        const params = new URLSearchParams({
+            loaders: JSON.stringify(["fabric"]),
+            game_versions: JSON.stringify([mcVersion]),
+        });
+        let url = 'https://api.modrinth.com/v2/project/fabric-api/version?' + params.toString()
+        console.log(url)
         xhttp.open("GET", url, true);
         xhttp.send();
     }
