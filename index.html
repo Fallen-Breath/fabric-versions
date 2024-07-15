@@ -5,6 +5,13 @@
     <meta charset="utf-8">
     <title>Fabric Versions</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/styles/default.min.css">
+
+<style>
+.properties {
+    tab-size: 4;
+}
+</style>
+
 </head>
 
 <body>
@@ -24,7 +31,7 @@
     minecraft "com.mojang:minecraft:{minecraft_version}"
     mappings "net.fabricmc:yarn:{yarn_version}:v2"
     modImplementation "net.fabricmc:fabric-loader:{loader_version}"
-            
+
     //Fabric api
     modImplementation "{fabric_maven}{fabric_version}"
 }</code></pre>
@@ -42,10 +49,28 @@ loader_version={loader_version}
 fabric_version={fabric_version}</code></pre>
     </div>
 
+    <h3>gradle.properties (<a href="https://github.com/Fallen-Breath/fabric-mod-template">fabric-mod-template</a>)</h3>
+    <div name="code">
+        <pre><code class="properties"># Fabric Properties
+	# check these on https://fallen-breath.github.io/fabric-versions/?&version={minecraft_version}
+	minecraft_version={minecraft_version}
+	yarn_mappings={yarn_version}
+
+# Fabric Mod Metadata
+	minecraft_dependency={minecraft_version}
+
+# Build Information
+	# The target mc versions for the mod during mod publishing, separated with \n
+	game_versions={minecraft_version}
+
+# Dependencies
+	# fabric_api_version={fabric_version}</code></pre>
+    </div>
+
     <br>
     <hr>
 
-    
+
     <h1>Mappings Migration</h1>
     <p>Mappings can be auto updated by using the following command. See the <a href="https://fabricmc.net/wiki/tutorial:migratemappings">wiki page</a> for more help.</p>
 
