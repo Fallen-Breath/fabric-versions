@@ -71,6 +71,10 @@
             text-align: center;
             margin-bottom: 15px;
             font-size: 1.1em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
         .mapping-selector {
@@ -105,6 +109,20 @@
             margin-left: 5px;
             min-width: 470px;
             max-width: 100%;
+        }
+
+        .release-only-label {
+            margin-left: 15px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .release-only-label input {
+            margin-right: 6px;
+            cursor: pointer;
         }
 
         .card {
@@ -186,6 +204,9 @@
             <select name="versions" id="versions">
                 <option>Loading...</option>
             </select>
+            <label class="release-only-label">
+                <input type="checkbox" id="release-only"> Release only
+            </label>
         </div>
 
         <div class="mapping-selector">
@@ -330,6 +351,7 @@ dependencies {
 
         document.addEventListener('DOMContentLoaded', () => {
             const select = document.getElementById("versions");
+            const releaseCheckbox = document.getElementById("release-only");
             const urlParams = new URLSearchParams(window.location.search);
 
             document.querySelectorAll('pre code').forEach(block => {
@@ -349,14 +371,13 @@ dependencies {
             });
 
             document.querySelector('.container').addEventListener('click', e => {
-                if (e.target.classList.contains('copy-btn')) {
-                    copyCode(e.target);
-                }
+                if (e.target.classList.contains('copy-btn')) copyCode(e.target);
             });
 
             select.addEventListener('change', () => updateUrlAndState(select.value, uiState.mapping));
+            releaseCheckbox.addEventListener('change', () => populateVersions(mcVersionsCache));
 
-            fetchJSON("https://meta.fabricmc.net/v1/versions/game", data => {
+            fetchJSON("https://meta.fabricmc.net/v2/versions/game", data => {
                 mcVersionsCache = data;
                 populateVersions(data);
             });
@@ -368,18 +389,43 @@ dependencies {
 
         function populateVersions(versions) {
             const select = document.getElementById("versions");
+            const isReleaseOnly = document.getElementById("release-only").checked;
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Determine target version: Query > Current UI > First Stable
+            let targetVersion = urlParams.get("version");
+            if (!targetVersion && uiState.minecraft_version) {
+                targetVersion = uiState.minecraft_version;
+            }
+            if (!targetVersion) {
+                targetVersion = versions.find(v => v.stable)?.version || versions[0].version;
+            }
+
             select.innerHTML = "";
+            let targetExists = false;
+
             versions.forEach(v => {
+                if (isReleaseOnly && !v.stable && v.version !== targetVersion) return;
+
                 const text = v.version + (v.stable ? "" : " (Snapshot)");
                 select.add(new Option(text, v.version));
+                if (v.version === targetVersion) targetExists = true;
             });
 
-            const stableVersion = versions.find(v => v.stable)?.version || versions[0].version;
-            const urlParams = new URLSearchParams(window.location.search);
-            const initialVersion = urlParams.get("version") || stableVersion;
+            // If target (User input or hidden snapshot) is not in list, add it manually
+            if (!targetExists) {
+                const knownVer = versions.find(v => v.version === targetVersion);
+                const text = targetVersion + (knownVer ? (knownVer.stable ? "" : " (Snapshot)") : " (Unknown)");
+                const opt = new Option(text, targetVersion);
+                // Insert at top to ensure visibility
+                select.insertBefore(opt, select.firstChild);
+            }
 
-            select.value = initialVersion;
-            reloadVersionData(initialVersion);
+            select.value = targetVersion;
+
+            if (targetVersion !== uiState.minecraft_version) {
+                updateUrlAndState(targetVersion, uiState.mapping);
+            }
         }
 
         function updateUrlAndState(version, mapping) {
@@ -387,60 +433,45 @@ dependencies {
             uiState.mapping = mapping;
 
             const qs = getQueryString(version, mapping);
-            const newUrl = window.location.pathname + '?' + qs;
-            window.history.pushState({}, '', newUrl);
-
+            window.history.pushState({}, '', window.location.pathname + '?' + qs);
             reloadVersionData(version);
         }
 
         function getQueryString(version, mapping) {
             const params = new URLSearchParams();
-            if (version) {
-                params.set('version', version);
-            }
-            if (mapping && mapping !== 'mojmap') {
-                params.set('mapping', mapping);
-            }
+            if (version) params.set('version', version);
+            if (mapping && mapping !== 'mojmap') params.set('mapping', mapping);
             return params.toString();
         }
 
         function reloadVersionData(version) {
             uiState.minecraft_version = version;
 
+            // Reset fields
             fetchedData.yarn_version = '{yarn_version}';
             fetchedData.loader_version = '{loader_version}';
             fetchedData.fabric_version = '{fabric_version}';
             fetchedData.parchment_version = '{parchment_version}';
 
-            if (version === "1.14") {
-                fetchedData.fabric_maven = "net.fabricmc:fabric:";
-            } else {
-                fetchedData.fabric_maven = "net.fabricmc.fabric-api:fabric-api:";
-            }
+            fetchedData.fabric_maven = (version === "1.14") ?
+                "net.fabricmc:fabric:" : "net.fabricmc.fabric-api:fabric-api:";
 
             const currentVerObj = mcVersionsCache.find(v => v.version === version);
-            const isStable = currentVerObj ? currentVerObj.stable : false;
+            // Treat unknown versions as stable for features like Parchment
+            const isStable = currentVerObj ? currentVerObj.stable : true;
 
-            if (!isStable) {
-                fetchedData.parchment_version = '';
-            }
+            if (!isStable) fetchedData.parchment_version = '';
 
             renderCodeBlocks();
 
             fetchJSON("https://meta.fabricmc.net/v2/versions/yarn/" + version, data => {
                 if (version !== uiState.minecraft_version) return;
-                if (data.length) {
-                    fetchedData.yarn_version = data[0].version;
-                    renderCodeBlocks();
-                }
+                if (data.length) { fetchedData.yarn_version = data[0].version; renderCodeBlocks(); }
             });
 
             fetchJSON("https://meta.fabricmc.net/v2/versions/loader/" + version, data => {
                 if (version !== uiState.minecraft_version) return;
-                if (data.length) {
-                    fetchedData.loader_version = data[0].loader.version;
-                    renderCodeBlocks();
-                }
+                if (data.length) { fetchedData.loader_version = data[0].loader.version; renderCodeBlocks(); }
             });
 
             const apiParams = new URLSearchParams({
@@ -464,10 +495,7 @@ dependencies {
                         if (version !== uiState.minecraft_version) return;
                         let is404 = false;
                         if (text && text.trim().startsWith('{')) {
-                            try {
-                                const json = JSON.parse(text);
-                                is404 = json.errors && json.errors[0].status === 404;
-                            } catch (e) { }
+                            try { is404 = JSON.parse(text).errors?.[0]?.status === 404; } catch (e) {}
                         }
                         fetchedData.parchment_version = (!is404 && text) ? text : '';
                         renderCodeBlocks();
@@ -485,10 +513,8 @@ dependencies {
             const cutoffIndex = mcVersionsCache.findIndex(v => v.version === "1.21.11");
             const currentIndex = mcVersionsCache.findIndex(v => v.version === uiState.minecraft_version);
 
-            let isUnobfuscated = false;
-            if (cutoffIndex !== -1 && currentIndex !== -1 && currentIndex < cutoffIndex) {
-                isUnobfuscated = true;
-            }
+            // Treat unknown versions (currentIndex === -1) as not-Unobfuscated (assuming old)
+            const isUnobfuscated = cutoffIndex !== -1 && currentIndex < cutoffIndex;
 
             Object.keys(TEMPLATE_CONFIG).forEach(id => {
                 const block = document.getElementById(id);
@@ -502,10 +528,9 @@ dependencies {
                         content = content.replace(/^\s*mappings.*\n?/gm, '');
                     }
 
-                    block.textContent = content.replace(/{(\w+)}/g, (_, key) => {
-                        return (replacements[key] !== undefined) ? replacements[key] : `{${key}}`;
-                    });
-
+                    block.textContent = content.replace(/{(\w+)}/g, (_, key) =>
+                        (replacements[key] !== undefined) ? replacements[key] : `{${key}}`
+                    );
                     block.removeAttribute('data-highlighted');
                     hljs.highlightElement(block);
                 }
@@ -517,12 +542,10 @@ dependencies {
             navigator.clipboard.writeText(codeBlock.textContent).then(() => {
                 const originalText = btn.textContent;
                 btn.textContent = "Copied!";
-                btn.style.color = "var(--accent-color)";
-                btn.style.borderColor = "var(--accent-color)";
+                btn.style.color = btn.style.borderColor = "var(--accent-color)";
                 setTimeout(() => {
                     btn.textContent = originalText;
-                    btn.style.color = "";
-                    btn.style.borderColor = "";
+                    btn.style.color = btn.style.borderColor = "";
                 }, 2000);
             });
         }
