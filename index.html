@@ -1,31 +1,170 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fabric Versions</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/styles/default.min.css">
 
-<style>
-.properties {
-    tab-size: 4;
-}
-</style>
+    <!-- Theme-adaptive Highlighting -->
+    <!-- Light Theme (Default) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/intellij-light.min.css">
+    <!-- Dark Theme (Only if system prefers dark) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/intellij-dark.min.css" media="(prefers-color-scheme: dark)">
 
+    <style>
+        :root {
+            /* Restored the light gray background for better contrast */
+            --bg-color: #fafbfc;
+            --text-color: #24292e;
+            --card-bg: #ffffff;
+            --border-color: #e1e4e8;
+            --primary-color: #24292e;
+            --accent-color: #0969da;
+            --btn-hover: #f3f4f6;
+
+            /* Pre-defined code styles to match GitHub Light */
+            --code-bg: #ffffff;
+            --code-text: #24292e;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0d1117;
+                --text-color: #c9d1d9;
+                --card-bg: #161b22;
+                --border-color: #30363d;
+                --primary-color: #c9d1d9;
+                --accent-color: #58a6ff;
+                --btn-hover: #21262d;
+
+                /* Pre-defined code styles to match GitHub Dark */
+                --code-bg: #0d1117;
+                --code-text: #c9d1d9;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 { margin-top: 1.5em; color: var(--primary-color); }
+        h1 { margin-top: 0.5em; text-align: center; }
+
+        a { color: var(--accent-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Version Selector */
+        .version-selector {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        select {
+            padding: 6px 10px;
+            font-size: 1em;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04); /* Subtle shadow for depth */
+        }
+
+        .card-header {
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.03); /* Slightly darker than card bg */
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: var(--card-bg);
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            background: var(--btn-hover);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        /* Code Block - Pre-styled to prevent jiggle */
+        pre {
+            margin: 0;
+            background-color: var(--code-bg);
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+            padding: 15px !important;
+            display: block;
+            color: var(--code-text);
+            background-color: var(--code-bg);
+        }
+
+        .properties { tab-size: 4; }
+
+        hr { border: 0; border-top: 1px solid var(--border-color); margin: 40px 0; }
+    </style>
 </head>
 
 <body>
-    <h1>Fabric Latest Versions</h1>
-    <p>Minecraft Version:
-        <select name="versions" id="versions" onchange="updateSelection()">
-        </select>
-    </p>
-    <p>Note fabric-api version may not be the correct version for the given minecraft version. See the <a
-            href="https://legacy.curseforge.com/minecraft/mc-mods/fabric-api/files">curseforge</a> page.</p>
+    <div class="container">
+        <h1>Fabric Latest Versions</h1>
 
-    <h3>build.gradle (mojmap)</h3>
-    <div name="code">
-        <pre><code class="gradle">dependencies {
+        <div class="version-selector">
+            <label for="versions">Minecraft Version:</label>
+            <select name="versions" id="versions" onchange="updateSelection()">
+                <option>Loading...</option>
+            </select>
+        </div>
+
+        <p>Note fabric-api version may not be the correct version for the given minecraft version. See the <a
+                href="https://legacy.curseforge.com/minecraft/mc-mods/fabric-api/files">curseforge</a> page.</p>
+
+        <!-- Mojmap -->
+        <div class="card">
+            <div class="card-header">
+                <span>build.gradle (mojmap)</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code class="language-gradle" id="code-mojmap">dependencies {
     minecraft "com.mojang:minecraft:{minecraft_version}"
     mappings officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:{loader_version}"
@@ -33,12 +172,15 @@
     //Fabric api
     modImplementation "{fabric_maven}{fabric_version}"
 }</code></pre>
-    </div>
+        </div>
 
-
-    <h3>build.gradle (yarn)</h3>
-    <div name="code">
-        <pre><code class="gradle">dependencies {
+        <!-- Yarn -->
+        <div class="card">
+            <div class="card-header">
+                <span>build.gradle (yarn)</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code class="language-gradle" id="code-yarn">dependencies {
     minecraft "com.mojang:minecraft:{minecraft_version}"
     mappings "net.fabricmc:yarn:{yarn_version}:v2"
     modImplementation "net.fabricmc:fabric-loader:{loader_version}"
@@ -46,22 +188,29 @@
     //Fabric api
     modImplementation "{fabric_maven}{fabric_version}"
 }</code></pre>
-    </div>
+        </div>
 
-
-    <h3>gradle.properties (Example Mod)</h3>
-    <div name="code">
-        <pre><code class="properties">minecraft_version={minecraft_version}
+        <!-- Props Simple -->
+        <div class="card">
+            <div class="card-header">
+                <span>gradle.properties (Example Mod)</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code class="language-properties properties" id="code-props-simple">minecraft_version={minecraft_version}
 yarn_mappings={yarn_version}
 loader_version={loader_version}
 
 #Fabric api
 fabric_version={fabric_version}</code></pre>
-    </div>
+        </div>
 
-    <h3>gradle.properties (My <a href="https://github.com/Fallen-Breath/fabric-mod-template">fabric-mod-template</a>)</h3>
-    <div name="code">
-        <pre><code class="properties"># Fabric Properties
+        <!-- Props Template (Strict Indent) -->
+        <div class="card">
+            <div class="card-header">
+                <span>gradle.properties (My <a href="https://github.com/Fallen-Breath/fabric-mod-template">fabric-mod-template</a>)</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+<pre><code class="language-properties properties" id="code-props-template"># Fabric Properties
 	# check these on https://fallen-breath.github.io/fabric-versions/?&version={minecraft_version}
 	minecraft_version={minecraft_version}
 	# https://maven.parchmentmc.org/org/parchmentmc/data/
@@ -78,221 +227,173 @@ fabric_version={fabric_version}</code></pre>
 	# fabric_api_version={fabric_version}</code></pre>
     </div>
 
-    <br>
     <hr>
-
 
     <h1>Mappings Migration</h1>
     <p>Mappings can be auto updated by using the following command. See the <a href="https://fabricmc.net/wiki/tutorial:migratemappings">wiki page</a> for more help.</p>
-
     <p>See <a href="https://fabricmc.net/develop/">fabricmc.net</a> for more details</p>
 
     <h1>Loom Version</h1>
+    <p>The recommended loom version, see <a href="https://fabricmc.net/develop/">fabricmc.net</a></p>
+    </div>
 
-    The recommended loom version, see <a href="https://fabricmc.net/develop/">fabricmc.net</a>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/gradle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/properties.min.js"></script>
 
+    <script>
+        // State
+        const state = {
+            minecraft: '{minecraft_version}',
+            yarn: '{yarn_version}',
+            loader: '{loader_version}',
+            fabricApi: '{fabric_version}',
+            fabricMaven: 'net.fabricmc.fabric-api:fabric-api:',
+            parchment: '{parchment_version}'
+        };
+
+        const templates = {};
+        let mcVersionsCache = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Save templates & init highlight
+            document.querySelectorAll('pre code').forEach(block => {
+                templates[block.id] = block.textContent;
+                hljs.highlightElement(block);
+            });
+
+            // Fetch Versions
+            fetch("https://meta.fabricmc.net/v1/versions/game")
+                .then(r => r.json())
+                .then(data => {
+                    mcVersionsCache = data;
+                    populateVersions(data);
+                })
+                .catch(e => console.error(e));
+        });
+
+        function populateVersions(versions) {
+            const select = document.getElementById("versions");
+            select.innerHTML = "";
+
+            let stableVersion = versions.find(v => v.stable)?.version || versions[0].version;
+
+            versions.forEach(v => {
+                let opt = document.createElement("option");
+                opt.value = v.version;
+                opt.text = v.version + (v.stable ? "" : " (Snapshot)");
+                select.add(opt);
+            });
+
+            const urlParams = new URLSearchParams(window.location.search);
+            select.value = urlParams.has("version") ? urlParams.get("version") : stableVersion;
+
+            loadData(select.value);
+        }
+
+        function updateSelection() {
+            const val = document.getElementById("versions").value;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set("version", val);
+            const newUrl = window.location.pathname + '?' + urlParams.toString();
+            window.history.pushState({path: newUrl}, '', newUrl);
+
+            loadData(val);
+        }
+
+        function loadData(version) {
+            state.minecraft = version;
+
+            // 1.14 Logic
+            let isOldApi = false;
+            for(let v of mcVersionsCache) {
+                if(v.version === "1.14") { isOldApi = true; break; }
+                if(v.version === version) break;
+            }
+            state.fabricMaven = isOldApi ? "net.fabricmc:fabric:" : "net.fabricmc.fabric-api:fabric-api:";
+
+            renderAll();
+
+            // Independent fetches
+
+            // Yarn
+            fetch("https://meta.fabricmc.net/v2/versions/yarn/" + version)
+                .then(r => r.json())
+                .then(data => {
+                    if(data.length) state.yarn = data[0].version;
+                    renderAll();
+                });
+
+            // Loader
+            fetch("https://meta.fabricmc.net/v2/versions/loader/" + version)
+                .then(r => r.json())
+                .then(data => {
+                    if(data.length) state.loader = data[0].loader.version;
+                    renderAll();
+                });
+
+            // Fabric API
+            const params = new URLSearchParams({
+                loaders: JSON.stringify(["fabric"]),
+                game_versions: JSON.stringify([version]),
+            });
+            fetch('https://api.modrinth.com/v2/project/fabric-api/version?' + params)
+                .then(r => r.json())
+                .then(data => {
+                    if(Array.isArray(data) && data.length) {
+                        data.sort((a, b) => new Date(a.date_published) - new Date(b.date_published));
+                        state.fabricApi = data[data.length - 1].version_number;
+                    }
+                    renderAll();
+                });
+
+            // Parchment
+            let pUrl = `https://ldtteam.jfrog.io/artifactory/api/search/latestVersion?g=org.parchmentmc.data&a=parchment-${version}&v=*&repos=parchmentmc-internal`;
+            fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(pUrl)}`)
+                .then(r => r.status === 200 ? r.text() : null)
+                .then(text => {
+                    if(text) state.parchment = text;
+                    renderAll();
+                });
+        }
+
+        function renderAll() {
+            Object.keys(templates).forEach(id => {
+                let code = templates[id];
+
+                code = code.replaceAll('{minecraft_version}', state.minecraft);
+                code = code.replaceAll('{yarn_version}', state.yarn);
+                code = code.replaceAll('{loader_version}', state.loader);
+                code = code.replaceAll('{fabric_version}', state.fabricApi);
+                code = code.replaceAll('{fabric_maven}', state.fabricMaven);
+                code = code.replaceAll('{parchment_version}', state.parchment);
+
+                const block = document.getElementById(id);
+                block.textContent = code;
+                block.removeAttribute('data-highlighted');
+                hljs.highlightElement(block);
+            });
+        }
+
+        function copyCode(btn) {
+            const card = btn.closest('.card');
+            const codeBlock = card.querySelector('code');
+
+            navigator.clipboard.writeText(codeBlock.textContent).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = "Copied!";
+                btn.style.borderColor = "var(--accent-color)";
+                btn.style.color = "var(--accent-color)";
+
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.borderColor = "";
+                    btn.style.color = "";
+                }, 2000);
+            });
+        }
+    </script>
 </body>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/highlight.min.js"></script>
-<script charset="UTF-8"
-    src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/gradle.min.js"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        document.querySelectorAll('pre code').forEach((block) => {
-            hljs.highlightBlock(block);
-        });
-    });
-</script>
-
-<script>
-
-    document.addEventListener('DOMContentLoaded', function () {
-
-        //Taken from https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-        String.prototype.replaceAll = function (search, replacement) {
-            var target = this;
-            return target.replace(new RegExp(search, 'g'), replacement);
-        };
-
-        getJSON("https://meta.fabricmc.net/v1/versions/game", function (data) {
-            populateVersions(data);
-        });
-
-
-
-    }, false);
-
-    var mcVersions;
-
-    function populateVersions(versions) {
-        var versionList = document.getElementById("versions");
-        var stable;
-
-        for (i in versions) {
-            var version = versions[i];
-
-            if (version.stable && stable == null) {
-                stable = version.version;
-            }
-
-            var option = document.createElement("option");
-            option.text = version.version;
-            versionList.add(option);
-        }
-
-        mcVersions = versions;
-
-        var urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has("version")) {
-            versionList.value = urlParams.get("version");
-        } else {
-            versionList.value = stable;
-        }
-
-        load();
-
-    }
-
-    function updateSelection() {
-        var versionList = document.getElementById("versions");
-        insertParam("version", versionList.value);
-    }
-
-    function load() {
-        var versionList = document.getElementById("versions");
-
-        var urlParams = new URLSearchParams(window.location.search);
-
-        var version = versionList.value;
-
-        if (urlParams.has("version")) {
-            version = urlParams.get("version");
-        }
-
-        function replaceAllCodeBlocks(src, dst) {
-            var codeBlocks = document.getElementsByName("code");
-            for (i in codeBlocks) {
-                var block = codeBlocks[i];
-                if (block.innerHTML) {
-                    block.innerHTML = block.innerHTML.replaceAll(src, dst);
-                }
-            }
-        }
-
-        replaceAllCodeBlocks("{minecraft_version}", version)
-        getJSON("https://meta.fabricmc.net/v2/versions/yarn/" + version, function (data) {
-            replaceAllCodeBlocks("{yarn_version}", data[0]['version']);
-        });
-        getJSON("https://meta.fabricmc.net/v2/versions/loader/" + version, function (data) {
-            replaceAllCodeBlocks("{loader_version}", data[0]['loader']['version']);
-        });
-        getMavenMetadataReleaseVersion(version, function (data) {
-            replaceAllCodeBlocks("{parchment_version}", data || '');
-        });
-
-        var mavenStr = "net.fabricmc:fabric:";
-        var newApi = true;
-        for(i in mcVersions){
-            var vi = mcVersions[i].version;
-            if(vi === "1.14"){
-                newApi = false;
-                break;
-            }
-            if(vi === version){
-                break;
-            }
-        }
-
-        if (newApi) {
-            mavenStr = "net.fabricmc.fabric-api:fabric-api:";
-        }
-
-        findVersion(version, function (fabricApiVersion) {
-            console.log('fabricApiVersion', fabricApiVersion)
-            replaceAllCodeBlocks("{fabric_version}", fabricApiVersion);
-            replaceAllCodeBlocks("{fabric_maven}", mavenStr);
-        })
-    }
-
-    function findVersion(mcVersion, onLoad) {
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                let data = JSON.parse(xhttp.responseText)
-                console.log('modrinth response:', data)
-                data.sort((a, b) => Date.parse(a['date_published']) - Date.parse(b['date_published']))
-                onLoad(data[data.length - 1]['version_number'])
-            }
-        };
-
-        const params = new URLSearchParams({
-            loaders: JSON.stringify(["fabric"]),
-            game_versions: JSON.stringify([mcVersion]),
-        });
-        let url = 'https://api.modrinth.com/v2/project/fabric-api/version?' + params.toString()
-        console.log(url)
-        xhttp.open("GET", url, true);
-        xhttp.send();
-    }
-
-    function getJSON(url, callback) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.responseType = 'json';
-        xhr.onload = function () {
-            var status = xhr.status;
-            if (status === 200) {
-                callback(xhr.response);
-            } else {
-                console.log('Something went wrong: ' + status);
-            }
-        };
-        xhr.send();
-    }
-
-    function getMavenMetadataReleaseVersion(version, callback) {
-        let url = `https://ldtteam.jfrog.io/artifactory/api/search/latestVersion?g=org.parchmentmc.data&a=parchment-${version}&v=*&repos=parchmentmc-internal`;
-        let finalUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
-        console.log(url, finalUrl);
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', finalUrl, true);
-        xhr.onload = function () {
-            var status = xhr.status;
-            console.log('metadata response', status, xhr.response)
-            if (status === 200) {
-                callback(xhr.response);
-            } else if (status === 404) {
-                callback(null);
-            } else {
-                console.log('Something went wrong: ' + status);
-            }
-        };
-        xhr.send();
-    }
-
-    //Thanks https://stackoverflow.com/questions/486896/adding-a-parameter-to-the-url-with-javascript
-    function insertParam(key, value) {
-        key = encodeURI(key); value = encodeURI(value);
-
-        var kvp = document.location.search.substr(1).split('&');
-
-        var i = kvp.length; var x; while (i--) {
-            x = kvp[i].split('=');
-
-            if (x[0] == key) {
-                x[1] = value;
-                kvp[i] = x.join('=');
-                break;
-            }
-        }
-
-        if (i < 0) { kvp[kvp.length] = [key, value].join('='); }
-
-        //this will reload the page, it's likely better to store this until finished
-        document.location.search = kvp.join('&');
-    }
-
-</script>
-
 </html>
