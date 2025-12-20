@@ -23,9 +23,20 @@
     <p>Note fabric-api version may not be the correct version for the given minecraft version. See the <a
             href="https://legacy.curseforge.com/minecraft/mc-mods/fabric-api/files">curseforge</a> page.</p>
 
-    <h3>build.gradle</h3>
+    <h3>build.gradle (mojmap)</h3>
+    <div name="code">
+        <pre><code class="gradle">dependencies {
+    minecraft "com.mojang:minecraft:{minecraft_version}"
+    mappings officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:{loader_version}"
+
+    //Fabric api
+    modImplementation "{fabric_maven}{fabric_version}"
+}</code></pre>
+    </div>
 
 
+    <h3>build.gradle (yarn)</h3>
     <div name="code">
         <pre><code class="gradle">dependencies {
     minecraft "com.mojang:minecraft:{minecraft_version}"
@@ -36,7 +47,6 @@
     modImplementation "{fabric_maven}{fabric_version}"
 }</code></pre>
     </div>
-
 
 
     <h3>gradle.properties (Example Mod)</h3>
@@ -54,7 +64,8 @@ fabric_version={fabric_version}</code></pre>
         <pre><code class="properties"># Fabric Properties
 	# check these on https://fallen-breath.github.io/fabric-versions/?&version={minecraft_version}
 	minecraft_version={minecraft_version}
-	yarn_mappings={yarn_version}
+	# https://maven.parchmentmc.org/org/parchmentmc/data/
+	parchment_version={parchment_version}
 
 # Fabric Mod Metadata
 	minecraft_dependency={minecraft_version}
@@ -159,15 +170,25 @@ fabric_version={fabric_version}</code></pre>
             version = urlParams.get("version");
         }
 
-        getJSON("https://meta.fabricmc.net/v1/versions/loader/" + version, function (data) {
-            var meta = data[0];
+        function replaceAllCodeBlocks(src, dst) {
             var codeBlocks = document.getElementsByName("code");
             for (i in codeBlocks) {
                 var block = codeBlocks[i];
-                block.innerHTML = block.innerHTML.replaceAll("{minecraft_version}", meta.mappings.gameVersion);
-                block.innerHTML = block.innerHTML.replaceAll("{yarn_version}", meta.mappings.version);
-                block.innerHTML = block.innerHTML.replaceAll("{loader_version}", meta.loader.version);
+                if (block.innerHTML) {
+                    block.innerHTML = block.innerHTML.replaceAll(src, dst);
+                }
             }
+        }
+
+        replaceAllCodeBlocks("{minecraft_version}", version)
+        getJSON("https://meta.fabricmc.net/v2/versions/yarn/" + version, function (data) {
+            replaceAllCodeBlocks("{yarn_version}", data[0]['version']);
+        });
+        getJSON("https://meta.fabricmc.net/v2/versions/loader/" + version, function (data) {
+            replaceAllCodeBlocks("{loader_version}", data[0]['loader']['version']);
+        });
+        getMavenMetadataReleaseVersion(version, function (data) {
+            replaceAllCodeBlocks("{parchment_version}", data || '');
         });
 
         var mavenStr = "net.fabricmc:fabric:";
@@ -189,12 +210,8 @@ fabric_version={fabric_version}</code></pre>
 
         findVersion(version, function (fabricApiVersion) {
             console.log('fabricApiVersion', fabricApiVersion)
-            var codeBlocks = document.getElementsByName("code");
-            for (i in codeBlocks) {
-                var block = codeBlocks[i];
-                block.innerHTML = block.innerHTML.replaceAll("{fabric_version}", fabricApiVersion);
-                block.innerHTML = block.innerHTML.replaceAll("{fabric_maven}", mavenStr);
-            }
+            replaceAllCodeBlocks("{fabric_version}", fabricApiVersion);
+            replaceAllCodeBlocks("{fabric_maven}", mavenStr);
         })
     }
 
@@ -232,7 +249,27 @@ fabric_version={fabric_version}</code></pre>
             }
         };
         xhr.send();
-    };
+    }
+
+    function getMavenMetadataReleaseVersion(version, callback) {
+        let url = `https://ldtteam.jfrog.io/artifactory/api/search/latestVersion?g=org.parchmentmc.data&a=parchment-${version}&v=*&repos=parchmentmc-internal`;
+        let finalUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
+        console.log(url, finalUrl);
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', finalUrl, true);
+        xhr.onload = function () {
+            var status = xhr.status;
+            console.log('metadata response', status, xhr.response)
+            if (status === 200) {
+                callback(xhr.response);
+            } else if (status === 404) {
+                callback(null);
+            } else {
+                console.log('Something went wrong: ' + status);
+            }
+        };
+        xhr.send();
+    }
 
     //Thanks https://stackoverflow.com/questions/486896/adding-a-parameter-to-the-url-with-javascript
     function insertParam(key, value) {
