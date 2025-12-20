@@ -158,6 +158,43 @@
         <p>Note fabric-api version may not be the correct version for the given minecraft version. See the <a
                 href="https://legacy.curseforge.com/minecraft/mc-mods/fabric-api/files">curseforge</a> page.</p>
 
+        <!-- Props Template (Strict Indent) -->
+        <div class="card">
+            <div class="card-header">
+                <span>gradle.properties (My <a href="https://github.com/Fallen-Breath/fabric-mod-template">fabric-mod-template</a>)</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+<pre><code class="language-properties properties" id="code-props-template"># Fabric Properties
+	# check these on https://fallen-breath.github.io/fabric-versions/?&version={minecraft_version}
+	minecraft_version={minecraft_version}
+	# https://maven.parchmentmc.org/org/parchmentmc/data/
+	parchment_version={parchment_version}
+
+# Fabric Mod Metadata
+	minecraft_dependency={minecraft_version}
+
+# Build Information
+	# The target mc versions for the mod during mod publishing, separated with \n
+	game_versions={minecraft_version}
+
+# Dependencies
+	# fabric_api_version={fabric_version}</code></pre>
+    </div>
+
+        <!-- Props Simple -->
+        <div class="card">
+            <div class="card-header">
+                <span>gradle.properties (Example Mod)</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code class="language-properties properties" id="code-props-simple">minecraft_version={minecraft_version}
+yarn_mappings={yarn_version}
+loader_version={loader_version}
+
+#Fabric api
+fabric_version={fabric_version}</code></pre>
+        </div>
+
         <!-- Mojmap -->
         <div class="card">
             <div class="card-header">
@@ -189,43 +226,6 @@
     modImplementation "{fabric_maven}{fabric_version}"
 }</code></pre>
         </div>
-
-        <!-- Props Simple -->
-        <div class="card">
-            <div class="card-header">
-                <span>gradle.properties (Example Mod)</span>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            </div>
-            <pre><code class="language-properties properties" id="code-props-simple">minecraft_version={minecraft_version}
-yarn_mappings={yarn_version}
-loader_version={loader_version}
-
-#Fabric api
-fabric_version={fabric_version}</code></pre>
-        </div>
-
-        <!-- Props Template (Strict Indent) -->
-        <div class="card">
-            <div class="card-header">
-                <span>gradle.properties (My <a href="https://github.com/Fallen-Breath/fabric-mod-template">fabric-mod-template</a>)</span>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            </div>
-<pre><code class="language-properties properties" id="code-props-template"># Fabric Properties
-	# check these on https://fallen-breath.github.io/fabric-versions/?&version={minecraft_version}
-	minecraft_version={minecraft_version}
-	# https://maven.parchmentmc.org/org/parchmentmc/data/
-	parchment_version={parchment_version}
-
-# Fabric Mod Metadata
-	minecraft_dependency={minecraft_version}
-
-# Build Information
-	# The target mc versions for the mod during mod publishing, separated with \n
-	game_versions={minecraft_version}
-
-# Dependencies
-	# fabric_api_version={fabric_version}</code></pre>
-    </div>
 
     <hr>
 
