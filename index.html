@@ -7,14 +7,11 @@
     <title>Fabric Versions</title>
 
     <!-- Theme-adaptive Highlighting -->
-    <!-- Light Theme (Default) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/intellij-light.min.css">
-    <!-- Dark Theme (Only if system prefers dark) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/intellij-dark.min.css" media="(prefers-color-scheme: dark)">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
 
     <style>
         :root {
-            /* Restored the light gray background for better contrast */
             --bg-color: #fafbfc;
             --text-color: #24292e;
             --card-bg: #ffffff;
@@ -22,25 +19,17 @@
             --primary-color: #24292e;
             --accent-color: #0969da;
             --btn-hover: #f3f4f6;
-
-            /* Pre-defined code styles to match GitHub Light */
-            --code-bg: #ffffff;
-            --code-text: #24292e;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-color: #0d1117;
+                --bg-color: #191919;
                 --text-color: #c9d1d9;
                 --card-bg: #161b22;
                 --border-color: #30363d;
                 --primary-color: #c9d1d9;
                 --accent-color: #58a6ff;
                 --btn-hover: #21262d;
-
-                /* Pre-defined code styles to match GitHub Dark */
-                --code-bg: #0d1117;
-                --code-text: #c9d1d9;
             }
         }
 
@@ -59,11 +48,24 @@
             margin: 0 auto;
         }
 
-        h1, h2, h3 { margin-top: 1.5em; color: var(--primary-color); }
-        h1 { margin-top: 0.5em; text-align: center; }
+        h1, h2, h3 {
+            margin-top: 1.5em;
+            color: var(--primary-color);
+        }
 
-        a { color: var(--accent-color); text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        h1 {
+            margin-top: 0.5em;
+            text-align: center;
+        }
+
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
 
         /* Version Selector */
         .version-selector {
@@ -91,12 +93,12 @@
             margin-bottom: 25px;
             overflow: hidden;
             position: relative;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04); /* Subtle shadow for depth */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
         .card-header {
             padding: 8px 16px;
-            background: rgba(0,0,0,0.03); /* Slightly darker than card bg */
+            background: rgba(0, 0, 0, 0.03);
             border-bottom: 1px solid var(--border-color);
             font-weight: 600;
             display: flex;
@@ -106,26 +108,25 @@
         }
 
         .copy-btn {
-            background: transparent;
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--text-color);
             padding: 4px 10px;
             font-size: 0.8rem;
             border-radius: 4px;
             cursor: pointer;
-            background-color: var(--card-bg);
             transition: all 0.2s;
         }
+
         .copy-btn:hover {
             background: var(--btn-hover);
             border-color: var(--accent-color);
             color: var(--accent-color);
         }
 
-        /* Code Block - Pre-styled to prevent jiggle */
+        /* Code Block */
         pre {
             margin: 0;
-            background-color: var(--code-bg);
             overflow-x: auto;
         }
 
@@ -134,13 +135,17 @@
             font-size: 0.9em;
             padding: 15px !important;
             display: block;
-            color: var(--code-text);
-            background-color: var(--code-bg);
         }
 
-        .properties { tab-size: 4; }
+        .properties {
+            tab-size: 4;
+        }
 
-        hr { border: 0; border-top: 1px solid var(--border-color); margin: 40px 0; }
+        hr {
+            border: 0;
+            border-top: 1px solid var(--border-color);
+            margin: 40px 0;
+        }
     </style>
 </head>
 
@@ -150,19 +155,22 @@
 
         <div class="version-selector">
             <label for="versions">Minecraft Version:</label>
-            <select name="versions" id="versions" onchange="updateSelection()">
+            <select name="versions" id="versions">
                 <option>Loading...</option>
             </select>
         </div>
 
-        <p>Note fabric-api version may not be the correct version for the given minecraft version. See the <a
-                href="https://legacy.curseforge.com/minecraft/mc-mods/fabric-api/files">curseforge</a> page.</p>
+        <p>
+            Note fabric-api version may not be the correct version for the given minecraft version.
+            See the <a href="https://legacy.curseforge.com/minecraft/mc-mods/fabric-api/files">CurseForge</a> or
+            <a href="https://modrinth.com/mod/fabric-api/versions">Modrinth</a> page.
+        </p>
 
-        <!-- Props Template (Strict Indent) -->
+        <!-- Props Template -->
         <div class="card">
             <div class="card-header">
                 <span>gradle.properties (My <a href="https://github.com/Fallen-Breath/fabric-mod-template">fabric-mod-template</a>)</span>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <button class="copy-btn">Copy</button>
             </div>
 <pre><code class="language-properties properties" id="code-props-template"># Fabric Properties
 	# check these on https://fallen-breath.github.io/fabric-versions/?&version={minecraft_version}
@@ -179,19 +187,19 @@
 
 # Dependencies
 	# fabric_api_version={fabric_version}</code></pre>
-    </div>
+        </div>
 
         <!-- Props Simple -->
         <div class="card">
             <div class="card-header">
-                <span>gradle.properties (Example Mod)</span>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <span>gradle.properties (<a href="https://github.com/FabricMC/fabric-example-mod">FabricMC/fabric-example-mod</a>)</span>
+                <button class="copy-btn">Copy</button>
             </div>
             <pre><code class="language-properties properties" id="code-props-simple">minecraft_version={minecraft_version}
 yarn_mappings={yarn_version}
 loader_version={loader_version}
 
-#Fabric api
+# Dependencies
 fabric_version={fabric_version}</code></pre>
         </div>
 
@@ -199,14 +207,14 @@ fabric_version={fabric_version}</code></pre>
         <div class="card">
             <div class="card-header">
                 <span>build.gradle (mojmap)</span>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <button class="copy-btn">Copy</button>
             </div>
             <pre><code class="language-gradle" id="code-mojmap">dependencies {
     minecraft "com.mojang:minecraft:{minecraft_version}"
     mappings officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:{loader_version}"
 
-    //Fabric api
+    // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "{fabric_maven}{fabric_version}"
 }</code></pre>
         </div>
@@ -215,26 +223,26 @@ fabric_version={fabric_version}</code></pre>
         <div class="card">
             <div class="card-header">
                 <span>build.gradle (yarn)</span>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <button class="copy-btn">Copy</button>
             </div>
             <pre><code class="language-gradle" id="code-yarn">dependencies {
     minecraft "com.mojang:minecraft:{minecraft_version}"
     mappings "net.fabricmc:yarn:{yarn_version}:v2"
     modImplementation "net.fabricmc:fabric-loader:{loader_version}"
 
-    //Fabric api
+    // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "{fabric_maven}{fabric_version}"
 }</code></pre>
         </div>
 
-    <hr>
+        <hr>
 
-    <h1>Mappings Migration</h1>
-    <p>Mappings can be auto updated by using the following command. See the <a href="https://fabricmc.net/wiki/tutorial:migratemappings">wiki page</a> for more help.</p>
-    <p>See <a href="https://fabricmc.net/develop/">fabricmc.net</a> for more details</p>
+        <h1>Mappings Migration</h1>
+        <p>Mappings can be auto updated by using the following command. See the <a href="https://fabricmc.net/wiki/tutorial:migratemappings">wiki page</a> for more help.</p>
+        <p>See <a href="https://fabricmc.net/develop/">fabricmc.net</a> for more details</p>
 
-    <h1>Loom Version</h1>
-    <p>The recommended loom version, see <a href="https://fabricmc.net/develop/">fabricmc.net</a></p>
+        <h1>Loom Version</h1>
+        <p>The recommended loom version, see <a href="https://fabricmc.net/develop/">fabricmc.net</a></p>
     </div>
 
     <!-- Scripts -->
@@ -243,25 +251,37 @@ fabric_version={fabric_version}</code></pre>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/properties.min.js"></script>
 
     <script>
-        // State
+        // Store state with keys matching the HTML placeholders for easy replacement
         const state = {
-            minecraft: '{minecraft_version}',
-            yarn: '{yarn_version}',
-            loader: '{loader_version}',
-            fabricApi: '{fabric_version}',
-            fabricMaven: 'net.fabricmc.fabric-api:fabric-api:',
-            parchment: '{parchment_version}'
+            minecraft_version: '{minecraft_version}',
+            yarn_version: '{yarn_version}',
+            loader_version: '{loader_version}',
+            fabric_version: '{fabric_version}',
+            parchment_version: '{parchment_version}',
+            fabric_maven: 'net.fabricmc.fabric-api:fabric-api:'
         };
 
         const templates = {};
         let mcVersionsCache = [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Save templates & init highlight
+            const select = document.getElementById("versions");
+
+            // Cache templates & Init Highlight
             document.querySelectorAll('pre code').forEach(block => {
                 templates[block.id] = block.textContent;
                 hljs.highlightElement(block);
             });
+
+            // Event Delegation for Copy Buttons
+            document.querySelector('.container').addEventListener('click', e => {
+                if (e.target.classList.contains('copy-btn')) {
+                    copyCode(e.target);
+                }
+            });
+
+            // Version Selector
+            select.addEventListener('change', () => updateSelection(select.value));
 
             // Fetch Versions
             fetch("https://meta.fabricmc.net/v1/versions/game")
@@ -277,101 +297,77 @@ fabric_version={fabric_version}</code></pre>
             const select = document.getElementById("versions");
             select.innerHTML = "";
 
-            let stableVersion = versions.find(v => v.stable)?.version || versions[0].version;
-
             versions.forEach(v => {
-                let opt = document.createElement("option");
-                opt.value = v.version;
-                opt.text = v.version + (v.stable ? "" : " (Snapshot)");
-                select.add(opt);
+                select.add(new Option(v.version + (v.stable ? "" : " (Snapshot)"), v.version));
             });
 
+            const stableVersion = versions.find(v => v.stable)?.version || versions[0].version;
             const urlParams = new URLSearchParams(window.location.search);
-            select.value = urlParams.has("version") ? urlParams.get("version") : stableVersion;
+            select.value = urlParams.get("version") || stableVersion;
 
+            // Initial load without pushing history state
             loadData(select.value);
         }
 
-        function updateSelection() {
-            const val = document.getElementById("versions").value;
-
-            const urlParams = new URLSearchParams(window.location.search);
-            urlParams.set("version", val);
-            const newUrl = window.location.pathname + '?' + urlParams.toString();
-            window.history.pushState({path: newUrl}, '', newUrl);
-
+        function updateSelection(val) {
+            const url = new URL(window.location);
+            url.searchParams.set("version", val);
+            window.history.pushState({}, '', url);
             loadData(val);
         }
 
         function loadData(version) {
-            state.minecraft = version;
+            state.minecraft_version = version;
 
-            // 1.14 Logic
+            // 1.14 Logic: older versions used a different maven artifact
             let isOldApi = false;
-            for(let v of mcVersionsCache) {
-                if(v.version === "1.14") { isOldApi = true; break; }
-                if(v.version === version) break;
+            for (const v of mcVersionsCache) {
+                if (v.version === "1.14") { isOldApi = true; break; }
+                if (v.version === version) break;
             }
-            state.fabricMaven = isOldApi ? "net.fabricmc:fabric:" : "net.fabricmc.fabric-api:fabric-api:";
+            state.fabric_maven = isOldApi ? "net.fabricmc:fabric:" : "net.fabricmc.fabric-api:fabric-api:";
 
             renderAll();
 
-            // Independent fetches
-
-            // Yarn
+            // Fetch dependent versions
             fetch("https://meta.fabricmc.net/v2/versions/yarn/" + version)
-                .then(r => r.json())
-                .then(data => {
-                    if(data.length) state.yarn = data[0].version;
+                .then(r => r.json()).then(data => {
+                    if (data.length) state.yarn_version = data[0].version;
                     renderAll();
                 });
 
-            // Loader
             fetch("https://meta.fabricmc.net/v2/versions/loader/" + version)
-                .then(r => r.json())
-                .then(data => {
-                    if(data.length) state.loader = data[0].loader.version;
+                .then(r => r.json()).then(data => {
+                    if (data.length) state.loader_version = data[0].loader.version;
                     renderAll();
                 });
 
-            // Fabric API
-            const params = new URLSearchParams({
+            const apiParams = new URLSearchParams({
                 loaders: JSON.stringify(["fabric"]),
                 game_versions: JSON.stringify([version]),
             });
-            fetch('https://api.modrinth.com/v2/project/fabric-api/version?' + params)
-                .then(r => r.json())
-                .then(data => {
-                    if(Array.isArray(data) && data.length) {
+            fetch('https://api.modrinth.com/v2/project/fabric-api/version?' + apiParams)
+                .then(r => r.json()).then(data => {
+                    if (Array.isArray(data) && data.length) {
                         data.sort((a, b) => new Date(a.date_published) - new Date(b.date_published));
-                        state.fabricApi = data[data.length - 1].version_number;
+                        state.fabric_version = data[data.length - 1].version_number;
+                        renderAll();
                     }
-                    renderAll();
                 });
 
-            // Parchment
-            let pUrl = `https://ldtteam.jfrog.io/artifactory/api/search/latestVersion?g=org.parchmentmc.data&a=parchment-${version}&v=*&repos=parchmentmc-internal`;
+            const pUrl = `https://ldtteam.jfrog.io/artifactory/api/search/latestVersion?g=org.parchmentmc.data&a=parchment-${version}&v=*&repos=parchmentmc-internal`;
             fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(pUrl)}`)
-                .then(r => r.status === 200 ? r.text() : null)
-                .then(text => {
-                    if(text) state.parchment = text;
+                .then(r => r.ok ? r.text() : null).then(text => {
+                    if (text) state.parchment_version = text;
                     renderAll();
                 });
         }
 
         function renderAll() {
             Object.keys(templates).forEach(id => {
-                let code = templates[id];
-
-                code = code.replaceAll('{minecraft_version}', state.minecraft);
-                code = code.replaceAll('{yarn_version}', state.yarn);
-                code = code.replaceAll('{loader_version}', state.loader);
-                code = code.replaceAll('{fabric_version}', state.fabricApi);
-                code = code.replaceAll('{fabric_maven}', state.fabricMaven);
-                code = code.replaceAll('{parchment_version}', state.parchment);
-
                 const block = document.getElementById(id);
-                block.textContent = code;
+                // Optimized regex replace based on matching keys in state object
+                block.textContent = templates[id].replace(/{(\w+)}/g, (_, key) => state[key] || `{${key}}`);
                 block.removeAttribute('data-highlighted');
                 hljs.highlightElement(block);
             });
