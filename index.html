@@ -107,7 +107,8 @@
             color: var(--text-color);
             cursor: pointer;
             margin-left: 5px;
-            min-width: 470px;
+            /* Mobile-friendly width constraint */
+            min-width: min(470px, 100%);
             max-width: 100%;
         }
 
@@ -174,9 +175,6 @@
             font-size: 0.9em;
             padding: 15px !important;
             display: block;
-        }
-
-        .properties {
             tab-size: 4;
         }
 
@@ -192,10 +190,14 @@
             font-size: 0.75rem;
             opacity: 0.7;
         }
+
+        /* Mapping Toggle Logic */
+        body.mapping-type-mojmap .block-yarn { display: none; }
+        body.mapping-type-yarn .block-mojmap { display: none; }
     </style>
 </head>
 
-<body>
+<body class="mapping-type-mojmap">
     <div class="container">
         <h1>Fabric Latest Versions</h1>
 
@@ -212,10 +214,10 @@
         <div class="mapping-selector">
             <span>Mappings:</span>
             <label class="mapping-label">
-                <input type="radio" name="mapping" value="mojmap" checked> Mojmap
+                <input type="radio" name="mappings" value="mojmap" checked> Mojmap
             </label>
             <label class="mapping-label">
-                <input type="radio" name="mapping" value="yarn"> Yarn
+                <input type="radio" name="mappings" value="yarn"> Yarn
             </label>
         </div>
 
@@ -225,12 +227,15 @@
             <a href="https://modrinth.com/mod/fabric-api/versions">Modrinth</a> page.
         </p>
 
+        <!-- Template 1: gradle.properties (Template) -->
         <div class="card">
             <div class="card-header">
                 <span>gradle.properties (My <a href="https://github.com/Fallen-Breath/fabric-mod-template">fabric-mod-template</a>)</span>
                 <button class="copy-btn">Copy</button>
             </div>
-<pre><code class="language-properties properties" id="code-props-template"># Fabric Properties
+
+            <!-- Mojmap Block -->
+            <pre class="block-mojmap"><code class="language-properties properties" id="t1-mojmap"># Fabric Properties
 	# check these on https://fallen-breath.github.io/fabric-versions/?{check_url_query}
 	minecraft_version={minecraft_version}
 	parchment_version={parchment_version}
@@ -244,32 +249,72 @@
 
 # Dependencies
 	# fabric_api_version={fabric_version}</code></pre>
+
+            <!-- Yarn Block -->
+            <pre class="block-yarn"><code class="language-properties properties" id="t1-yarn"># Fabric Properties
+	# check these on https://fallen-breath.github.io/fabric-versions/?{check_url_query}
+	minecraft_version={minecraft_version}
+	yarn_mappings={yarn_version}
+
+# Fabric Mod Metadata
+	minecraft_dependency={minecraft_version}
+
+# Build Information
+	# The target mc versions for the mod during mod publishing, separated with \n
+	game_versions={minecraft_version}
+
+# Dependencies
+	# fabric_api_version={fabric_version}</code></pre>
         </div>
 
+        <!-- Template 2: gradle.properties (Simple) -->
         <div class="card">
             <div class="card-header">
                 <span>gradle.properties (<a href="https://github.com/FabricMC/fabric-example-mod">FabricMC/fabric-example-mod</a>)</span>
                 <button class="copy-btn">Copy</button>
             </div>
-<pre><code class="language-properties properties" id="code-props-simple">minecraft_version={minecraft_version}
+
+            <!-- Mojmap Block -->
+            <pre class="block-mojmap"><code class="language-properties properties" id="t2-mojmap">minecraft_version={minecraft_version}
+loader_version={loader_version}
+
+# Dependencies
+fabric_version={fabric_version}</code></pre>
+
+            <!-- Yarn Block -->
+            <pre class="block-yarn"><code class="language-properties properties" id="t2-yarn">minecraft_version={minecraft_version}
+yarn_mappings={yarn_version}
 loader_version={loader_version}
 
 # Dependencies
 fabric_version={fabric_version}</code></pre>
         </div>
 
+        <!-- Template 3: build.gradle -->
         <div class="card">
             <div class="card-header">
                 <span>build.gradle</span>
                 <button class="copy-btn">Copy</button>
             </div>
-<pre><code class="language-gradle" id="code-build-gradle">dependencies {
-    minecraft "com.mojang:minecraft:{minecraft_version}"
-    mappings officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:{loader_version}"
 
-    // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "{fabric_maven}{fabric_version}"
+            <!-- Mojmap Block -->
+            <pre class="block-mojmap"><code class="language-gradle" id="t3-mojmap">dependencies {
+	minecraft "com.mojang:minecraft:{minecraft_version}"
+	mappings officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:{loader_version}"
+
+	// Fabric API. This is technically optional, but you probably want it anyway.
+	modImplementation "{fabric_maven}{fabric_version}"
+}</code></pre>
+
+            <!-- Yarn Block -->
+            <pre class="block-yarn"><code class="language-gradle" id="t3-yarn">dependencies {
+	minecraft "com.mojang:minecraft:{minecraft_version}"
+	mappings "net.fabricmc:yarn:{yarn_version}:v2"
+	modImplementation "net.fabricmc:fabric-loader:{loader_version}"
+
+	// Fabric API. This is technically optional, but you probably want it anyway.
+	modImplementation "{fabric_maven}{fabric_version}"
 }</code></pre>
         </div>
 
@@ -301,51 +346,10 @@ fabric_version={fabric_version}</code></pre>
         };
         const uiState = {
             minecraft_version: '',
-            mapping: 'mojmap'
+            mappings: 'mojmap'
         };
 
-        const TEMPLATE_CONFIG = {
-            "code-props-template": {
-                yarn: `
-# Fabric Properties
-	# check these on https://fallen-breath.github.io/fabric-versions/?{check_url_query}
-	minecraft_version={minecraft_version}
-	yarn_mappings={yarn_version}
-
-# Fabric Mod Metadata
-	minecraft_dependency={minecraft_version}
-
-# Build Information
-	# The target mc versions for the mod during mod publishing, separated with \\n
-	game_versions={minecraft_version}
-
-# Dependencies
-	# fabric_api_version={fabric_version}
-`
-            },
-            "code-props-simple": {
-                yarn: `
-minecraft_version={minecraft_version}
-yarn_mappings={yarn_version}
-loader_version={loader_version}
-
-# Dependencies
-fabric_version={fabric_version}
-`
-            },
-            "code-build-gradle": {
-                yarn: `
-dependencies {
-    minecraft "com.mojang:minecraft:{minecraft_version}"
-    mappings "net.fabricmc:yarn:{yarn_version}:v2"
-    modImplementation "net.fabricmc:fabric-loader:{loader_version}"
-
-    // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "{fabric_maven}{fabric_version}"
-}
-`
-            }
-        };
+        const rawTemplates = {};
 
         let mcVersionsCache = [];
 
@@ -354,29 +358,36 @@ dependencies {
             const releaseCheckbox = document.getElementById("release-only");
             const urlParams = new URLSearchParams(window.location.search);
 
+            // 1. Read templates from DOM
             document.querySelectorAll('pre code').forEach(block => {
-                if (TEMPLATE_CONFIG[block.id]) {
-                    TEMPLATE_CONFIG[block.id].mojmap = block.textContent;
-                }
+                rawTemplates[block.id] = block.textContent;
                 hljs.highlightElement(block);
             });
 
-            if (urlParams.get("mapping") === "yarn") {
-                uiState.mapping = "yarn";
+            // 2. Init UI State
+            if (urlParams.get("mappings") === "yarn") {
+                uiState.mappings = "yarn";
+                document.body.classList.replace('mapping-type-mojmap', 'mapping-type-yarn');
             }
 
-            document.getElementsByName("mapping").forEach(radio => {
-                radio.checked = (radio.value === uiState.mapping);
-                radio.addEventListener('change', e => updateUrlAndState(uiState.minecraft_version, e.target.value));
+            // 3. Event Listeners
+            document.getElementsByName("mappings").forEach(radio => {
+                radio.checked = (radio.value === uiState.mappings);
+                radio.addEventListener('change', e => {
+                    document.body.classList.remove('mapping-type-mojmap', 'mapping-type-yarn');
+                    document.body.classList.add('mapping-type-' + e.target.value);
+                    updateUrlAndState(uiState.minecraft_version, e.target.value);
+                });
             });
 
             document.querySelector('.container').addEventListener('click', e => {
                 if (e.target.classList.contains('copy-btn')) copyCode(e.target);
             });
 
-            select.addEventListener('change', () => updateUrlAndState(select.value, uiState.mapping));
+            select.addEventListener('change', () => updateUrlAndState(select.value, uiState.mappings));
             releaseCheckbox.addEventListener('change', () => populateVersions(mcVersionsCache));
 
+            // 4. Initial Fetch
             fetchJSON("https://meta.fabricmc.net/v2/versions/game", data => {
                 mcVersionsCache = data;
                 populateVersions(data);
@@ -392,14 +403,10 @@ dependencies {
             const isReleaseOnly = document.getElementById("release-only").checked;
             const urlParams = new URLSearchParams(window.location.search);
 
-            // Determine target version: Query > Current UI > First Stable
+            // Target Priority: URL > UI State > Latest Stable
             let targetVersion = urlParams.get("version");
-            if (!targetVersion && uiState.minecraft_version) {
-                targetVersion = uiState.minecraft_version;
-            }
-            if (!targetVersion) {
-                targetVersion = versions.find(v => v.stable)?.version || versions[0].version;
-            }
+            if (!targetVersion && uiState.minecraft_version) targetVersion = uiState.minecraft_version;
+            if (!targetVersion) targetVersion = versions.find(v => v.stable)?.version || versions[0].version;
 
             select.innerHTML = "";
             let targetExists = false;
@@ -407,63 +414,58 @@ dependencies {
             versions.forEach(v => {
                 if (isReleaseOnly && !v.stable && v.version !== targetVersion) return;
 
-                const text = v.version + (v.stable ? "" : " (Snapshot)");
-                select.add(new Option(text, v.version));
+                select.add(new Option(v.version + (v.stable ? "" : " (Snapshot)"), v.version));
                 if (v.version === targetVersion) targetExists = true;
             });
 
-            // If target (User input or hidden snapshot) is not in list, add it manually
+            // Ensure target version is selectable
             if (!targetExists) {
                 const knownVer = versions.find(v => v.version === targetVersion);
                 const text = targetVersion + (knownVer ? (knownVer.stable ? "" : " (Snapshot)") : " (Unknown)");
-                const opt = new Option(text, targetVersion);
-                // Insert at top to ensure visibility
-                select.insertBefore(opt, select.firstChild);
+                select.insertBefore(new Option(text, targetVersion), select.firstChild);
             }
 
             select.value = targetVersion;
 
             if (targetVersion !== uiState.minecraft_version) {
-                updateUrlAndState(targetVersion, uiState.mapping);
+                updateUrlAndState(targetVersion, uiState.mappings);
             }
         }
 
-        function updateUrlAndState(version, mapping) {
+        function updateUrlAndState(version, mappings) {
             uiState.minecraft_version = version;
-            uiState.mapping = mapping;
+            uiState.mappings = mappings;
 
-            const qs = getQueryString(version, mapping);
+            const qs = getQueryString(version, mappings);
             window.history.pushState({}, '', window.location.pathname + '?' + qs);
+
             reloadVersionData(version);
         }
 
-        function getQueryString(version, mapping) {
+        function getQueryString(version, mappings) {
             const params = new URLSearchParams();
             if (version) params.set('version', version);
-            if (mapping && mapping !== 'mojmap') params.set('mapping', mapping);
+            if (mappings && mappings !== 'mojmap') params.set('mappings', mappings);
             return params.toString();
         }
 
         function reloadVersionData(version) {
-            uiState.minecraft_version = version;
-
             // Reset fields
             fetchedData.yarn_version = '{yarn_version}';
             fetchedData.loader_version = '{loader_version}';
             fetchedData.fabric_version = '{fabric_version}';
             fetchedData.parchment_version = '{parchment_version}';
-
-            fetchedData.fabric_maven = (version === "1.14") ?
-                "net.fabricmc:fabric:" : "net.fabricmc.fabric-api:fabric-api:";
+            fetchedData.fabric_maven = (version === "1.14") ? "net.fabricmc:fabric:" : "net.fabricmc.fabric-api:fabric-api:";
 
             const currentVerObj = mcVersionsCache.find(v => v.version === version);
-            // Treat unknown versions as stable for features like Parchment
+            // Treat unknown/custom versions as stable (allows Parchment check)
             const isStable = currentVerObj ? currentVerObj.stable : true;
 
             if (!isStable) fetchedData.parchment_version = '';
 
             renderCodeBlocks();
 
+            // Async Fetches
             fetchJSON("https://meta.fabricmc.net/v2/versions/yarn/" + version, data => {
                 if (version !== uiState.minecraft_version) return;
                 if (data.length) { fetchedData.yarn_version = data[0].version; renderCodeBlocks(); }
@@ -507,47 +509,51 @@ dependencies {
             const replacements = {
                 ...uiState,
                 ...fetchedData,
-                check_url_query: getQueryString(uiState.minecraft_version, uiState.mapping)
+                check_url_query: getQueryString(uiState.minecraft_version, uiState.mappings)
             };
 
             const cutoffIndex = mcVersionsCache.findIndex(v => v.version === "1.21.11");
             const currentIndex = mcVersionsCache.findIndex(v => v.version === uiState.minecraft_version);
 
-            // Treat unknown versions (currentIndex === -1) as not-Unobfuscated (assuming old)
-            const isUnobfuscated = cutoffIndex !== -1 && currentIndex < cutoffIndex;
+            // Unobfuscated: Newer than 1.21.11. Unknown (index -1) treated as Obfuscated (Old).
+            const isUnobfuscated = (currentIndex !== -1) && (cutoffIndex !== -1) && (currentIndex < cutoffIndex);
 
-            Object.keys(TEMPLATE_CONFIG).forEach(id => {
+            Object.keys(rawTemplates).forEach(id => {
                 const block = document.getElementById(id);
-                const rawTemplate = TEMPLATE_CONFIG[id][uiState.mapping];
+                let content = rawTemplates[id];
 
-                if (rawTemplate) {
-                    let content = rawTemplate.trim();
-
-                    if (id === 'code-build-gradle' && isUnobfuscated) {
-                        content = content.replace(/modImplementation/g, 'implementation');
-                        content = content.replace(/^\s*mappings.*\n?/gm, '');
-                    }
-
-                    block.textContent = content.replace(/{(\w+)}/g, (_, key) =>
-                        (replacements[key] !== undefined) ? replacements[key] : `{${key}}`
-                    );
-                    block.removeAttribute('data-highlighted');
-                    hljs.highlightElement(block);
+                if (id.startsWith('t3-') && isUnobfuscated) {
+                    content = content.replace(/modImplementation/g, 'implementation');
+                    content = content.replace(/^\s*mappings.*\n?/gm, '');
                 }
+
+                block.textContent = content.replace(/{(\w+)}/g, (_, key) =>
+                    (replacements[key] !== undefined) ? replacements[key] : `{${key}}`
+                );
+
+                block.removeAttribute('data-highlighted');
+                hljs.highlightElement(block);
             });
         }
 
         function copyCode(btn) {
-            const codeBlock = btn.closest('.card').querySelector('code');
-            navigator.clipboard.writeText(codeBlock.textContent).then(() => {
-                const originalText = btn.textContent;
-                btn.textContent = "Copied!";
-                btn.style.color = btn.style.borderColor = "var(--accent-color)";
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.color = btn.style.borderColor = "";
-                }, 2000);
-            });
+            const card = btn.closest('.card');
+            // Find the visible code block within this card
+            const visibleCode = Array.from(card.querySelectorAll('pre')).find(pre => getComputedStyle(pre).display !== 'none')?.querySelector('code');
+
+            if (visibleCode) {
+                navigator.clipboard.writeText(visibleCode.textContent).then(() => {
+                    const originalText = btn.textContent;
+                    btn.textContent = "Copied!";
+                    btn.style.color = "var(--accent-color)";
+                    btn.style.borderColor = "var(--accent-color)";
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.color = "";
+                        btn.style.borderColor = "";
+                    }, 2000);
+                });
+            }
         }
     </script>
 </body>
