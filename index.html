@@ -491,7 +491,7 @@ fabric_version={fabric_version}</code></pre>
 
             if (isStable) {
                 const pUrl = `https://ldtteam.jfrog.io/artifactory/api/search/latestVersion?g=org.parchmentmc.data&a=parchment-${version}&v=*&repos=parchmentmc-internal`;
-                fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(pUrl)}`)
+                fetch(`https://corsproxy.fallenbreath.me/?${pUrl}`)
                     .then(r => r.ok ? r.text() : null)
                     .then(text => {
                         if (version !== uiState.minecraft_version) return;
